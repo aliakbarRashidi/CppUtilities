@@ -1,17 +1,19 @@
 # CppUtilities
 C++ Utilities set. A library for threading, thread safe signal/slot system and binary debugging. It makes use of features available from C++11 like templates, std::function, std::bind.
 
-## Prerequities
+## > Prerequities
 You need at least C++17 (but you can even with 11th, but there is "inline static"s) and libstd++
 
-## Compile
+## > Compile
 Just use
 ```
 $ qmake
 $ make
 ```
+But as it does not have no external dependencies, you can put it in a CMake, Meson (...) build system easily.
+The library is designed for GNU/Linux use, not for other operating systems, the debuging features might not work (like stack frames print).
 
-## Classes and their debugging features
+## > Classes and their debugging features
 All debuging features can be found in cpputilities_global.h. If they are not enabled at compile time of the library, using debuging features in your application is an undefined behaviour. Classes provided when debuging enabled and not are not the same, but you can use both in their original way. Additional features can be added (like names for signals and slots). All signals are thread safe. YOU just have to put the RIGHT TARGET THREAD when constructing a ftor.
 GenericFunctor, GenericExecutor and SingleLooping are classes meant of one time use. Passing a GenericFunctor or GenericExecutor to classes from the library are undefined behaviour. And ALWAYS use new () to provide a ftor or xtor as they are automatically deleted in the classes' internals.
 
@@ -38,7 +40,7 @@ You pass in a GenericFunctor and its arguments. Notice that it is as GenericExec
 + Operator GenericExecutor<void> for GenericExecutor<C, Args ...> ---> You cannot recover the original return type
 + GenericExecutor<> ---> GenericExecutor<void>
 
-## Introspection system
+## > Introspection system
 Each introspection systems use UID and getters, so you can get any of the supported object from its *Tracker class by ID.
   
 ### Signals/Slots System
@@ -49,5 +51,6 @@ Attention, SignalTracker::get() is static, if it is deleted, SignalTracker::acce
 ### Threading
 Threads have an elaborated tracking system too. You can get the stopped threads, the running ones, every thread that is alive. Methods in ThreadTracking are close to the ones available in SignalTracker.
 
-## The debuging
+## > The debuging
 At your program startup, you have to pass arg 0 (char *), if mtrace is activated (bool) and if you want to enable debug at runtime (bool) in CppUtilities::setup_sig_handle. The function will setup additional data (e.g. the binary path) and the signal handlers. Its behaviour can be changed by using DEBUG_ALL_OUTS that will print data even if the event have been triggered by the user (SIGINT), or FORCE_DEBUG that will ignore if debug at runtime is enabled and print data. The data is composed of 1. The log built from addr2line results with the stack frames' addresses, and 2. The log of the stack frames' addresses, with wild binary path (on Linux, /proc/exe) or the library it comes from (e.g. glibc). Additional log is printed for running threads and sopped ones when THREAD_TRACKING is enabled. If in setup_sig_handles you have specified that mtrace is active, muntrace() will be called at end of the signal handler.
+Additional functions are exposed to let you print debuging data at runtime from anywhere in your app.
